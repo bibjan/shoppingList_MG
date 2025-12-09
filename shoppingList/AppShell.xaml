@@ -4,12 +4,20 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:shoppingList"
+    xmlns:views="clr-namespace:shoppingList.Views"
     Shell.FlyoutBehavior="Disabled"
-    Title="shoppingList">
-
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    Title="shoppingList"
+    Shell.TabBarBackgroundColor="#1f1f1f">
+    <TabBar>
+        <ShellContent
+            Title="Lista zakupów"
+            ContentTemplate="{DataTemplate views:ShoppingList}" />
+        <ShellContent
+            Title="Przepisy"
+            ContentTemplate="{DataTemplate views:Recipes}" />
+        <ShellContent
+            Title="Sklepy"
+            ContentTemplate="{DataTemplate views:Shops}" />
+    </TabBar>
 
 </Shell>

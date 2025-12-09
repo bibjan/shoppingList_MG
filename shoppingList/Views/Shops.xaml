@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="shoppingList.Views.Shops"
+             xmlns:views="clr-namespace:shoppingList.Views"
+             xmlns:ViewModels="clr-namespace:shoppingList.ViewModels"
+             BindingContext="{x:Static ViewModels:ShopsViewModel.Instance}"
+             BackgroundColor="#1f1f1f">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Dodaj sklep"
+                     Command="{Binding NewShopCommand}"
+                     IconImageSource="{FontImage Glyph='+', Size=22, Color=White}" />
+    </ContentPage.ToolbarItems>
+
+    <CollectionView ItemsSource="{Binding Shops}" IsGrouped="False">
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="ViewModels:ShopItemViewModel">
+                <views:ShopItem />
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+</ContentPage>

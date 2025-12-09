@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="shoppingList.Views.ProductItemRecipe"
+             xmlns:ViewModels="clr-namespace:shoppingList.ViewModels"
+             x:DataType="ViewModels:ProductItemViewModel">
+    
+    
+    <Border Stroke="#363636"
+            BackgroundColor="#363636"
+            StrokeThickness="2"
+            Padding="15"
+            Margin="35,10,35,10"
+            StrokeShape="RoundRectangle 20,20,20,20">
+
+        <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center" ColumnSpacing="12">
+
+            <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                <Label Text="{Binding Name}"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       FontSize="20"
+                       TextColor="White">
+                </Label>
+                <Label Text="(opcjonalny)"
+                       FontAttributes="Italic"
+                       VerticalOptions="Center"
+                       FontSize="14"
+                       TextColor="LightGray"
+                       IsVisible="{Binding IsOptional}" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Grid.Column="1"
+                                   HorizontalOptions="Center"
+                                   Spacing="8">
+                <Entry Text="{Binding Value, Mode=TwoWay}"
+                       FontAttributes="Bold"
+                       FontSize="20"
+                       HorizontalTextAlignment="Center"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       WidthRequest="100"/>
+
+                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6">
+                    <Button Grid.Column="0"
+                            BackgroundColor="IndianRed"
+                            Text="-"
+                            FontAttributes="Bold"
+                            FontSize="20"
+                            Command="{Binding SubtractCommand}" />
+                    <Button Grid.Column="1"
+                            BackgroundColor="LawnGreen"
+                            Text="+"
+                            FontAttributes="Bold"
+                            FontSize="20"
+                            Command="{Binding AddCommand}" />
+                </Grid>
+
+                <Picker ItemsSource="{Binding Units}"
+                        SelectedItem="{Binding SelectedUnit, Mode=TwoWay}"
+                        TextColor="White"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Grid.Column="2"
+                                   HorizontalOptions="End"
+                                   VerticalOptions="Center">
+                <Button BackgroundColor="#2b2b2b"
+                        TextColor="White"
+                        Margin="15,0,0,0"
+                        Text="Edytuj"
+                        Command="{Binding EditProductCommand}"/>
+            </HorizontalStackLayout>
+        </Grid>
+    </Border>
+</ContentView>

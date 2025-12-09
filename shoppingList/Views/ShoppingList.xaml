@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:shoppingList.Views"
+             xmlns:ViewModels="clr-namespace:shoppingList.ViewModels"
+             x:Class="shoppingList.Views.ShoppingList"
+             BindingContext="{x:Static ViewModels:ShoppingViewModel.Instance}"
+             BackgroundColor="#1f1f1f">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Dodaj kategorie"
+                     Command="{Binding NewCategoryCommand}"
+                     IconImageSource="{FontImage Glyph='+', Size=22, Color=White}" />
+        <ToolbarItem Text="Dodaj produkt"
+                     Command="{Binding NewProductCommand}"
+                     IconImageSource="{FontImage Glyph='+', Size=22, Color=White}" />
+    </ContentPage.ToolbarItems>
+
+
+    <Grid RowDefinitions="Auto,*">
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Margin="10">
+            <Button Text="Eksport"
+                    Command="{Binding ExportCommand}"
+                    BackgroundColor="#8a41a6"
+                    TextColor="White"
+                    Margin="5,0" />
+            <Button Text="Import"
+                    Command="{Binding ImportCommand}"
+                    BackgroundColor="#8a41a6"
+                    TextColor="White"
+                    Margin="5,0" />
+        </HorizontalStackLayout>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}" IsGrouped="False">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="ViewModels:CategoryItemViewModel">
+                    <views:CategoryItem />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

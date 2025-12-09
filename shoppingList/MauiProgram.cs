@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using shoppingList.ViewModels;
 
 namespace shoppingList
 {
@@ -16,7 +17,7 @@ namespace shoppingList
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
