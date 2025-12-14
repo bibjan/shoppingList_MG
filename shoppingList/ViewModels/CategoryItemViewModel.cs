@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using shoppingList.Models;
 
 namespace shoppingList.ViewModels
 {
@@ -29,10 +30,19 @@ namespace shoppingList.ViewModels
 
         public IRelayCommand ToggleExpandCommand { get; }
 
-        public CategoryItemViewModel(string categoryName)
+        public CategoryItemViewModel(Category category)
         {
-            CategoryName = categoryName;
+            CategoryName = category?.Name ?? string.Empty;
             ToggleExpandCommand = new RelayCommand(() => IsExpanded = !IsExpanded);
+
+            if (category?.Products != null)
+            {
+                foreach (var p in category.Products)
+                {
+                    var pvm = new ProductItemViewModel(p);
+                    this.Add(pvm);
+                }
+            }
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using shoppingList.Models;
+using System.Collections.Generic;
+using System;
 
 namespace shoppingList.ViewModels
 {
@@ -24,22 +26,44 @@ namespace shoppingList.ViewModels
 
         public void InitializeDefaultRecipes()
         {
-            var scrambledEggs = new RecipeItemViewModel("Jajecznica", "Na patelni rozpuść masło. Dodaj jajka i na średnim ogniu mieszaj jajka do ścięcia. W trakcie mieszania dodaj szynke i sól.");
-            scrambledEggs.Products.Add(new ProductItemViewModel(new Shopping("Jajka") { Value = 3, Unit = "szt." }));
-            scrambledEggs.Products.Add(new ProductItemViewModel(new Shopping("Masło") { Value = 15, Unit = "g" }));
-            scrambledEggs.Products.Add(new ProductItemViewModel(new Shopping("Szynka") { Value = 100, Unit = "g" }));
-            scrambledEggs.Products.Add(new ProductItemViewModel(new Shopping("Sól") { Value = 1, Unit = "szczypta" }));
-            Recipes.Add(scrambledEggs);
+            var scrambledEggs = new Recipe("Jajecznica");
+            scrambledEggs.Steps.AddRange(new List<string>
+            {
+                "Na patelni rozpuść masło.",
+                "Wbij jajka i mieszaj na średnim ogniu, aż się zetną.",
+                "Dodaj pokrojoną szynkę i sól do smaku, wymieszaj."
+            });
+            scrambledEggs.Products.Add((new Product("Jajka") { Value = 3, Unit = "szt." }));
+            scrambledEggs.Products.Add((new Product("Masło") { Value = 15, Unit = "g" }));
+            scrambledEggs.Products.Add((new Product("Szynka") { Value = 100, Unit = "g" }));
+            scrambledEggs.Products.Add((new Product("Sól") { Value = 1, Unit = "szczypta" }));
 
-            var pancakes = new RecipeItemViewModel("Naleśniki", "Wymieszaj mąkę z jajkami, stopniowo dodając mleko. Dodaj szczyptę cukru i roztopione masło. Smaż cienkie placki na rozgrzanej patelni po ok. 1-2 min z każdej strony.");
-            pancakes.Products.Add(new ProductItemViewModel(new Shopping("Mąka") { Value = 250, Unit = "g" }));
-            pancakes.Products.Add(new ProductItemViewModel(new Shopping("Mleko") { Value = 500, Unit = "ml" }));
-            pancakes.Products.Add(new ProductItemViewModel(new Shopping("Jajka") { Value = 2, Unit = "szt." }));
-            pancakes.Products.Add(new ProductItemViewModel(new Shopping("Cukier") { Value = 2, Unit = "szczypta" }));
-            pancakes.Products.Add(new ProductItemViewModel(new Shopping("Masło") { Value = 5, Unit = "g" }));
-            Recipes.Add(pancakes);
+            var scrambledVm = new RecipeItemViewModel(scrambledEggs.Name, scrambledEggs.Steps);
+            foreach (var p in scrambledEggs.Products)
+            {
+                scrambledVm.Products.Add(new ProductItemViewModel(p));
+            }
+            Recipes.Add(scrambledVm);
 
-            Data.Save();
+            var pancakes = new Recipe("Naleśniki");
+            pancakes.Steps.AddRange(new List<string>
+            {
+                "Wymieszaj mąkę z jajkami i stopniowo dolewaj mleko, aż powstanie gładkie ciasto.",
+                "Dodaj szczyptę soli i trochę roztopionego masła do ciasta.",
+                "Smaż cienkie placki na rozgrzanej patelni po 1-2 min z każdej strony."
+            });
+            pancakes.Products.Add((new Product("Mąka") { Value = 250, Unit = "g" }));
+            pancakes.Products.Add((new Product("Mleko") { Value = 500, Unit = "ml" }));
+            pancakes.Products.Add((new Product("Jajka") { Value = 2, Unit = "szt." }));
+            pancakes.Products.Add((new Product("Cukier") { Value = 2, Unit = "szczypta" }));
+            pancakes.Products.Add((new Product("Masło") { Value = 5, Unit = "g" }));
+
+            var pancakesVm = new RecipeItemViewModel(pancakes.Name, pancakes.Steps);
+            foreach (var p in pancakes.Products)
+            {
+                pancakesVm.Products.Add(new ProductItemViewModel(p));
+            }
+            Recipes.Add(pancakesVm);
         }
 
         private async Task NewRecipeAsync()
@@ -55,20 +79,80 @@ namespace shoppingList.ViewModels
                 return;
             }
 
-            var input2 = await Shell.Current.DisplayPromptAsync("Dodaj instrukcje",
-                "Podaj instrukcje przepisu:",
-                "OK",
-                "Anuluj");
-            var recipeDesc = input2?.Trim();
+            var useNumberedSteps = await Shell.Current.DisplayAlert(
+                "Instrukcje",
+                "Czy chcesz dodać instrukcje?",
+                "Tak",
+                "Nie");
 
-            if (string.IsNullOrWhiteSpace(recipeDesc))
+            var steps = new List<string>();
+
+            if (useNumberedSteps)
             {
-                return;
+                int index = 1;
+
+                while (true)
+                {
+                    var stepInput = await Shell.Current.DisplayPromptAsync(
+                        $"Krok {index}",
+                        $"Podaj treść kroku {index}:",
+                        "Dodaj",
+                        "Zakończ");
+
+                    var step = stepInput?.Trim();
+                    if (string.IsNullOrWhiteSpace(step))
+                    {
+                        if (steps.Count == 0)
+                        {
+                            var fallback = await Shell.Current.DisplayPromptAsync("Dodaj instrukcje",
+                                "Podaj instrukcje przepisu:",
+                                "OK",
+                                "Anuluj");
+                            var fallbackText = fallback?.Trim() ?? "";
+                            if (string.IsNullOrWhiteSpace(fallbackText))
+                                return;
+                            steps.Add(fallbackText);
+                            break;
+                        }
+                        break;
+                    }
+
+                    steps.Add(step);
+                    index++;
+
+                    var addMore = await Shell.Current.DisplayAlert(
+                        "Dodaj kolejny krok?",
+                        "Czy chcesz dodać kolejny krok?",
+                        "Tak",
+                        "Nie");
+
+                    if (!addMore) break;
+                }
+
+                if (steps.Count == 0)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                var input2 = await Shell.Current.DisplayPromptAsync("Dodaj instrukcje",
+                    "Podaj instrukcje przepisu:",
+                    "OK",
+                    "Anuluj");
+                var recipeDesc = input2?.Trim();
+
+                if (string.IsNullOrWhiteSpace(recipeDesc))
+                {
+                    return;
+                }
+
+                steps.Add(recipeDesc);
             }
 
-            Recipes.Add(new RecipeItemViewModel(recipeName, recipeDesc));
+            Recipes.Add(new RecipeItemViewModel(recipeName, steps));
 
-            Data.Save();
+            ShoppingList.SaveFromViewModels(ShoppingViewModel.Instance, ShopsViewModel.Instance, RecipesViewModel.Instance);
         }
 
         private async Task AddProductAsync()
@@ -104,7 +188,7 @@ namespace shoppingList.ViewModels
                 selectedUnit = "szt.";
             }
 
-            var newProduct = new ProductItemViewModel(new Shopping(name)
+            var newProduct = new ProductItemViewModel(new Product(name)
             {
                 Category = selectedRecipe,
                 Unit = selectedUnit
@@ -113,7 +197,7 @@ namespace shoppingList.ViewModels
             var targetGroup = Recipes.First(r => r.RecipeName == selectedRecipe);
             targetGroup.Products.Add(newProduct);
 
-            Data.Save();
+            ShoppingList.SaveFromViewModels(ShoppingViewModel.Instance, ShopsViewModel.Instance, RecipesViewModel.Instance);
         }
     }
 }

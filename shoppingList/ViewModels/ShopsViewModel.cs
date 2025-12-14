@@ -33,10 +33,11 @@ namespace shoppingList.ViewModels
             {
                 return;
             }
+            var shop = new Shop(shopName);
+            var shopVm = new ShopItemViewModel(shop);
+            Shops.Add(shopVm);
 
-            Shops.Add(new ShopItemViewModel(shopName));
-
-            Data.Save();
+            ShoppingList.SaveFromViewModels(ShoppingViewModel.Instance, ShopsViewModel.Instance, RecipesViewModel.Instance);
         }
     }
 }

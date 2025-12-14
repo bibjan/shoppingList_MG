@@ -1,23 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using shoppingList.Models;
-using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace shoppingList.ViewModels
 {
     public class ProductItemViewModel : ObservableObject
     {
-        private Shopping _shopping;
+        private Product _product;
 
         public string? Name
         {
-            get => _shopping.Name;
+            get => _product.Name;
             set
             {
-                if (_shopping.Name != value)
+                if (_product.Name != value)
                 {
-                    _shopping.Name = value;
+                    _product.Name = value;
                     OnPropertyChanged();
                 }
             }
@@ -25,12 +25,12 @@ namespace shoppingList.ViewModels
 
         public bool IsOptional
         {
-            get => _shopping.IsOptional;
+            get => _product.IsOptional;
             set
             {
-                if (_shopping.IsOptional != value)
+                if (_product.IsOptional != value)
                 {
-                    _shopping.IsOptional = value;
+                    _product.IsOptional = value;
                     OnPropertyChanged();
                 }
             }
@@ -38,13 +38,13 @@ namespace shoppingList.ViewModels
 
         public int Value
         {
-            get => _shopping.Value;
+            get => _product.Value;
             set
             {
                 var newValue = value < 0 ? 0 : value;
-                if (_shopping.Value != newValue)
+                if (_product.Value != newValue)
                 {
-                    _shopping.Value = newValue;
+                    _product.Value = newValue;
                     OnPropertyChanged();
                 }
             }
@@ -52,12 +52,12 @@ namespace shoppingList.ViewModels
 
         public bool IsChecked
         {
-            get => _shopping.IsChecked;
+            get => _product.IsChecked;
             set
             {
-                if (_shopping.IsChecked != value)
+                if (_product.IsChecked != value)
                 {
-                    _shopping.IsChecked = value;
+                    _product.IsChecked = value;
                     OnPropertyChanged();
                 }
             }
@@ -65,12 +65,12 @@ namespace shoppingList.ViewModels
 
         public string? SelectedShop
         {
-            get => _shopping.Shop;
+            get => _product.Shop;
             set
             {
-                if (_shopping.Shop != value)
+                if (_product.Shop != value)
                 {
-                    _shopping.Shop = value;
+                    _product.Shop = value;
                     OnPropertyChanged();
                 }
             }
@@ -87,40 +87,38 @@ namespace shoppingList.ViewModels
 
         public string? SelectedUnit
         {
-            get => _shopping.Unit;
+            get => _product.Unit;
             set
             {
-                if (_shopping.Unit != value)
+                if (_product.Unit != value)
                 {
-                    _shopping.Unit = value;
+                    _product.Unit = value;
                     OnPropertyChanged();
-                    Data.Save();
+                    ShoppingList.SaveFromViewModels(
+                        ShoppingViewModel.Instance,
+                        ShopsViewModel.Instance,
+                        RecipesViewModel.Instance);
                 }
             }
         }
 
-        private string[] options =
-        [
-            "Opcjonalność", "Sklep"
-        ];
+        private readonly string[] _options = { "Opcjonalność", "Sklep" };
 
-        public ProductItemViewModel(Shopping shopping)
+        public ProductItemViewModel(Product product)
         {
-            _shopping = shopping;
-            if (string.IsNullOrWhiteSpace(_shopping.Name))
-                _shopping.Name = "Produkt";
-
-            OnPropertyChanged(nameof(Name));
+            _product = product;
+            if (string.IsNullOrWhiteSpace(_product.Name))
+                _product.Name = "Produkt";
 
             AddCommand = new RelayCommand(() =>
             {
-                _shopping.Add();
+                _product.Add();
                 OnPropertyChanged(nameof(Value));
             });
 
             SubtractCommand = new RelayCommand(() =>
             {
-                _shopping.Subtract();
+                _product.Subtract();
                 OnPropertyChanged(nameof(Value));
             });
 
@@ -133,7 +131,7 @@ namespace shoppingList.ViewModels
                     "Co chcesz edytować?",
                     "Anuluj",
                     null,
-                    options);
+                    _options);
 
                 if (string.IsNullOrWhiteSpace(selected) || selected == "Anuluj")
                 {
@@ -148,8 +146,10 @@ namespace shoppingList.ViewModels
                         null,
                         IsOptional ? "Nieopcjonalny" : "Opcjonalny");
 
-                    IsOptional = !IsOptional;
-                    OnPropertyChanged(nameof(IsOptional));
+                    if (!string.IsNullOrWhiteSpace(optional) && optional != "Anuluj")
+                    {
+                        IsOptional = !IsOptional;
+                    }
                 }
                 else if (selected == "Sklep")
                 {
@@ -172,7 +172,8 @@ namespace shoppingList.ViewModels
 
                     SelectedShop = selectedShopName;
                 }
-                Data.Save();
+
+                ShoppingList.SaveFromViewModels(ShoppingViewModel.Instance, ShopsViewModel.Instance, RecipesViewModel.Instance);
             });
         }
     }

@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using shoppingList.Models;
+
 
 namespace shoppingList.ViewModels
 {
@@ -13,9 +15,15 @@ namespace shoppingList.ViewModels
         public string ShopName { get; }
         public ObservableCollection<ProductItemViewModel> Products { get; } = new();
 
-        public ShopItemViewModel(string shopName)
+
+        public ShopItemViewModel(Shop shop)
         {
-            ShopName = shopName;
+            ShopName = shop.Name;
+
+            foreach (var p in shop.Products)
+            {
+                Products.Add(new ProductItemViewModel(p));
+            }
         }
     }
 }

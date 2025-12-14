@@ -5,7 +5,7 @@
              xmlns:ViewModels="clr-namespace:shoppingList.ViewModels"
              xmlns:views="clr-namespace:shoppingList.Views"
              x:DataType="ViewModels:RecipeItemViewModel">
-    
+
     <VerticalStackLayout>
 
         <Border Stroke="#8a41a6"
@@ -25,8 +25,7 @@
                             FontSize="25"
                             Margin="30,0,0,0"
                             TextColor="White"
-                            VerticalOptions="Center">
-                    </Label>
+                            VerticalOptions="Center" />
                     <Button Grid.Column="1"
                             BackgroundColor="#703587"
                             Command="{Binding ImportToListCommand}"
@@ -34,11 +33,19 @@
                             TextColor="White"
                             Text="Importuj do listy"/>
                 </Grid>
-                <Label Text="{Binding RecipeDescription}"
-                       FontSize="14"
-                       Margin="30,10,0,0"
-                       TextColor="LightGray"
-                       VerticalOptions="Center" />
+
+                <VerticalStackLayout Margin="30,10,0,0"
+                                     BindableLayout.ItemsSource="{Binding StepLines}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Label Text="{Binding .}"
+                                   FontSize="14"
+                                   TextColor="LightGray"
+                                   LineBreakMode="WordWrap" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
             </VerticalStackLayout>
         </Border>
 

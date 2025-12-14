@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace shoppingList.Models
 {
-    public class Shopping
+    public class Product
     {
         public string Name { get; set; }
         public string Category { get; set; }
@@ -18,7 +18,7 @@ namespace shoppingList.Models
         public string? Unit { get; set; }
         public string? Shop { get; set; }
 
-        public Shopping(string name)
+        public Product(string name)
         {
             Name = name;
         }

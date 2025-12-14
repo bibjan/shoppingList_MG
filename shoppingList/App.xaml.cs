@@ -8,8 +8,6 @@ namespace shoppingList
         {
             InitializeComponent();
 
-            Data.Load();
-
             MainPage = new AppShell();
         }
     }

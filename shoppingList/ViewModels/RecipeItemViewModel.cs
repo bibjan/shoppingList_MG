@@ -4,23 +4,42 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using shoppingList.Models;
+using System.Collections.Specialized;
+using System;
+using System.Collections.Generic;
 
 namespace shoppingList.ViewModels
 {
     public class RecipeItemViewModel : ObservableObject
     {
         public string RecipeName { get; }
-        public string RecipeDescription { get; }
+        public ObservableCollection<string> Steps { get; } = new();
 
         public IAsyncRelayCommand ImportToListCommand { get; }
         public ObservableCollection<ProductItemViewModel> Products { get; } = new();
 
-        public RecipeItemViewModel(string recipeName, string recipeDescription)
+        public RecipeItemViewModel(string recipeName, IEnumerable<string>? steps = null)
         {
             RecipeName = recipeName;
-            RecipeDescription = recipeDescription;
+            if (steps != null)
+            {
+                foreach (var s in steps)
+                    Steps.Add(s);
+            }
+
+            Steps.CollectionChanged += Steps_CollectionChanged;
             ImportToListCommand = new AsyncRelayCommand(ImportToListAsync);
         }
+
+        private void Steps_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(StepsDisplay));
+            OnPropertyChanged(nameof(StepLines));
+        }
+
+        public string StepsDisplay => string.Join(Environment.NewLine, Steps.Select((s, i) => $"{i + 1}. {s}"));
+
+        public IEnumerable<string> StepLines => Steps.Select((s, i) => $"{i + 1}. {s}");
 
         private async Task ImportToListAsync()
         {
@@ -48,7 +67,7 @@ namespace shoppingList.ViewModels
                     continue;
                 }
 
-                var shoppingModel = new Shopping(product.Name ?? "Produkt")
+                var shoppingModel = new Product(product.Name ?? "Produkt")
                 {
                     Category = selectedCategory,
                     Value = product.Value,
@@ -71,7 +90,7 @@ namespace shoppingList.ViewModels
                 RecipesViewModel.Instance.Recipes.Remove(this);
             }
 
-            Data.Save();
+            ShoppingList.SaveFromViewModels(ShoppingViewModel.Instance, ShopsViewModel.Instance, RecipesViewModel.Instance);
         }
     }
 }
